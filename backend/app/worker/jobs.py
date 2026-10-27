@@ -17,6 +17,8 @@ from app.settings import get_settings
 
 log = logging.getLogger("relay.worker")
 MAX_EMAIL_ATTEMPTS = 6
+# Small batches keep one scheduler call short (EventBridge API destinations time out after a few seconds).
+EMAIL_BATCH = 25
 
 
 def send_emails(db: Session, now: datetime | None = None, sender: Callable = mailer.send) -> int:
@@ -26,7 +28,7 @@ def send_emails(db: Session, now: datetime | None = None, sender: Callable = mai
         .join(User, User.id == Notification.user_id)
         .where(Notification.emailed_at.is_(None), Notification.email_attempts < MAX_EMAIL_ATTEMPTS)
         .order_by(Notification.created_at)
-        .limit(100)
+        .limit(EMAIL_BATCH)
         .with_for_update(of=Notification, skip_locked=True)
     ).all()
     sent = 0
@@ -97,19 +99,46 @@ JOBS: dict[str, tuple[Callable[[Session], int | None], int]] = {
 }
 
 
-def run(name: str) -> None:
+def run(name: str) -> bool:
+    """Run one job under its advisory lock and record the finish time. Returns False if another runner holds it."""
     fn, _ = JOBS[name]
     lock_id = 0x52454C00 + list(JOBS).index(name)  # "REL" + index
     with session_factory()() as db:
         if not db.scalar(text("SELECT pg_try_advisory_lock(:k)"), {"k": lock_id}):
-            return
+            return False
         try:
             result = fn(db)
             if result:
                 log.info("job done", extra={"extra_fields": {"job": name, "result": result}})
+            _record(db, name, "ok" if result is None else str(result))
         except Exception:
             db.rollback()
             log.exception("job failed", extra={"extra_fields": {"job": name}})
+            _record(db, name, "failed")
         finally:
             db.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": lock_id})
             db.commit()
+    return True
+
+
+def _record(db: Session, name: str, result: str) -> None:
+    db.execute(
+        text("""
+        INSERT INTO job_runs (name, last_finished_at, last_result) VALUES (:n, now(), :r)
+        ON CONFLICT (name) DO UPDATE SET last_finished_at = now(), last_result = :r
+        """),
+        {"n": name, "r": result[:200]},
+    )
+    db.commit()
+
+
+def due_jobs(now: datetime | None = None) -> list[str]:
+    now = now or utcnow()
+    with session_factory()() as db:
+        last = dict(db.execute(text("SELECT name, last_finished_at FROM job_runs")).all())
+    return [n for n, (_, every) in JOBS.items() if n not in last or last[n] + timedelta(seconds=every) <= now]
+
+
+def run_due(now: datetime | None = None) -> dict[str, bool]:
+    """For schedulers that can only make an HTTP call (AWS EventBridge every minute): run whatever is due."""
+    return {name: run(name) for name in due_jobs(now)}

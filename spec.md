@@ -410,6 +410,8 @@ UI requirements: clear empty and error states; mobile-responsive; times always s
 
 Run in a separate worker process (APScheduler or a simple loop) so the web process stays responsive:
 
+*(On AWS the long-running worker is replaced by EventBridge calling a key-protected `POST /api/internal/jobs/tick` every minute, which runs whichever jobs are due; locally the worker process still runs them. Both paths share the same job code, locks and `job_runs` bookkeeping.)*
+
 - Send queued emails and retry failures.
 - Send booking reminders.
 - Expire stale access requests and ended grants; notify before expiry.
@@ -445,9 +447,9 @@ Browser (React)  -->  FastAPI app  -->  PostgreSQL
 
 - **Backend:** FastAPI, SQLAlchemy 2.x, Alembic migrations, Pydantic v2.
 - **Database:** PostgreSQL with `btree_gist` and `citext` extensions.
-- **Packaging:** Docker Compose with services `api`, `worker`, `db`, `frontend` (static build served by a reverse proxy).
+- **Packaging:** Docker Compose with services `api`, `worker`, `db`, `frontend`, `mailpit` for local development; in production the backend runs as one container image on App Runner and the frontend as a static Amplify build.
 - **Config:** a single settings module reading environment variables (database URL, SMTP, timezone, base URL).
-- **Deployment target:** a single Ubuntu VM paid for with student credits (DigitalOcean via the GitHub Student Developer Pack; Azure for Students as an alternative), running the production Docker Compose stack with Postgres in a container. Needs HTTPS (Caddy, automatic certificates) and daily database backups. See `docs/deploy-vm.md`.
+- **Deployment target:** AWS. The React frontend on **AWS Amplify Hosting** (built from GitHub `main`), which proxies `/api/*` to the FastAPI container on **AWS App Runner**; **Amazon RDS for PostgreSQL 16** (supports `btree_gist` and `citext`; automated daily backups, 7-day retention); **Amazon EventBridge** calls a key-protected job endpoint every minute in place of a long-running worker. Defined in `deploy/aws/backend.yml`; see `docs/deploy-aws.md`.
 - **Observability:** structured logs, a `/health` endpoint, and error tracking if available.
 
 ---

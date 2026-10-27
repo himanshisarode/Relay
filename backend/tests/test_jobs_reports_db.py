@@ -90,3 +90,17 @@ def test_audit_log_is_append_only(db, world):
     with pytest.raises(DBAPIError):
         db.execute(text("UPDATE audit_log SET action = 'x'"))
     db.rollback()
+
+
+def test_scheduler_tick_endpoint(client, world, monkeypatch):
+    from app.settings import get_settings
+    from app.worker.jobs import JOBS
+
+    url = "/api/internal/jobs/tick"
+    assert client.post(url).status_code == 404  # disabled until a key is configured
+    monkeypatch.setattr(get_settings(), "cron_key", "s3cret-key")
+    assert client.post(url, headers={"X-Relay-Cron-Key": "wrong"}).status_code == 403
+    first = client.post(url, headers={"X-Relay-Cron-Key": "s3cret-key"})
+    assert first.status_code == 200 and set(first.json()["ran"]) == set(JOBS)
+    # Straight after, nothing is due yet: every job has an interval of at least 30 seconds.
+    assert client.post(url, headers={"X-Relay-Cron-Key": "s3cret-key"}).json()["ran"] == {}

@@ -4,8 +4,8 @@ Book shared lab instruments and meeting rooms with access rules decided by each 
 
 - **What and why:** [`spec.md`](spec.md)
 - **How, in what order, and status:** [`plan.md`](plan.md)
-- **Putting it online (permanent link):** [`docs/deploy-vm.md`](docs/deploy-vm.md)
-- **Running it in production:** [`docs/operations.md`](docs/operations.md)
+- **Putting it online on AWS Amplify (permanent link):** [`docs/deploy-aws.md`](docs/deploy-aws.md)
+- **Running it on AWS day to day:** [`docs/operations.md`](docs/operations.md)
 - **10-minute demo walkthrough:** [`docs/demo-script.md`](docs/demo-script.md)
 
 ## Run it locally
@@ -46,7 +46,7 @@ docker compose --profile public up -d
 docker compose logs tunnel        # look for https://<random>.trycloudflare.com
 ```
 
-Anyone can open that address in a browser and sign in with the demo accounts. It works only while this computer and Docker are running, and the address changes each time the tunnel restarts. Stop sharing with `docker compose stop tunnel`. For a permanent address, follow [`docs/deploy-vm.md`](docs/deploy-vm.md).
+Anyone can open that address in a browser and sign in with the demo accounts. It works only while this computer and Docker are running, and the address changes each time the tunnel restarts. Stop sharing with `docker compose stop tunnel`. For a permanent address, deploy to AWS: [`docs/deploy-aws.md`](docs/deploy-aws.md).
 
 ## Run the backend without Docker
 
@@ -86,6 +86,7 @@ Inside Docker, run `docker compose exec api pytest -q`. The test database `relay
 ```
 backend/   FastAPI app (app/), Alembic migration, worker, seed, tests
 frontend/  React + Vite + Tailwind; FullCalendar for the week view
-deploy/    backup script, Postgres init
-docs/      operations runbook, demo script
+deploy/    aws/ (CloudFormation, deploy script, Amplify rewrites), initdb/ for local Postgres
+docs/      AWS deployment, operations runbook, demo script
+amplify.yml  Amplify Hosting build settings for frontend/
 ```

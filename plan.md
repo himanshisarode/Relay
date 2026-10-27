@@ -4,7 +4,7 @@ Companion to `spec.md`. The spec says **what** to build; this file says **how an
 
 **Status legend:** `[ ]` not started · `[~]` built, waiting on verification · `[x]` done and verified · `[?]` blocked on a decision from outside the team
 
-> **Current state (2026-10-27):** M1–M6 are implemented and verified: **358 backend tests pass against real PostgreSQL 16 in Docker** (0 skipped), plus frontend type-check, unit tests and production build. The full Docker stack runs (API, worker, frontend, Postgres, Mailpit), and email delivery was checked end to end. Still open: a manual browser walk-through (M7) and the pilot decisions.
+> **Current state (2026-10-27):** M1–M6 are implemented and verified: **359 backend tests pass against real PostgreSQL 16 in Docker** (0 skipped), plus frontend type-check, unit tests and production build. The full Docker stack runs (API, worker, frontend, Postgres, Mailpit), and email delivery was checked end to end. Still open: a manual browser walk-through (M7) and the pilot decisions.
 
 ---
 
@@ -32,7 +32,7 @@ Department admins (HOD) can do the same for every lab in their department, appoi
 | Q4 | Pilot lab and its professor? | Seeded from `instruments_list` → `backend/seed/institute.yaml`: **14 departments, 30 labs, 104 resources, a professor per lab, a HOD per department, 3 students per lab** (all fictional). The real pilot lab is set up in the Admin UI; no code depends on which lab it is. | **Needs confirmation** by M7 |
 | Q5 | Import existing booking data? | No import in v1. A CSV import script is a P2 task, only if the pilot has a spreadsheet. | Decided |
 | Q6 | Check-in / sign-off after use? | Not in v1. `requires_checkin` is in the schema (default false). Check-in, no-show and post-use sign-off are P2. | Decided |
-| Q7 | Hosting and ownership? | **Option B (decided 2026-10-27): a student-credit VM**, DigitalOcean via the GitHub Student Developer Pack (Azure for Students as fallback). Ubuntu 24.04, 2 GB RAM, running `docker-compose.prod.yml` unchanged: Caddy with automatic HTTPS, Postgres in a container, nightly `pg_dump` (14-day retention). Address: own domain from the Student Pack, or `<ip>.sslip.io` with no domain. Email via an SMTP provider (e.g. Brevo free tier). Set up with `deploy/setup-server.sh` per `docs/deploy-vm.md`. Rejected: Oracle Always Free (fiddly sign-up, ARM capacity limits), managed platforms (app changes, sleeping free tiers), split hosting (most moving parts). | Host decided; **waiting on you** to create the account and server. Owner after the course still to confirm |
+| Q7 | Hosting and ownership? | **AWS (decided 2026-10-27, replacing the student-VM choice made earlier that day).** Frontend on **Amplify Hosting** from GitHub `main` (monorepo root `frontend/`, `amplify.yml`), proxying `/api/*` to the backend so cookies stay same-origin. Backend container on **App Runner**; **RDS PostgreSQL 16** (`db.t4g.micro`, TLS forced, 7-day automated backups); **EventBridge** calls `POST /api/internal/jobs/tick` every minute instead of a worker process (App Runner throttles CPU between requests, so an in-process scheduler wouldn't run reliably). All backend resources in `deploy/aws/backend.yml` (cfn-lint clean), deployed with `deploy/aws/deploy-backend.sh`; steps in `docs/deploy-aws.md`. Trade-off: RDS is internet-reachable (TLS + 40-char random password) to avoid a paid NAT gateway; tightening steps documented. | Host decided; **waiting on you** for the AWS account and the console steps. Owner after the course still to confirm |
 
 ### 0.3 Technical decisions
 
@@ -54,7 +54,7 @@ Department admins (HOD) can do the same for every lab in their department, appoi
 | Hiding records | Someone else's booking, request or grant returns **404**, not 403, so existence isn't leaked |
 | Audit log | Append-only, enforced by a trigger that rejects UPDATE/DELETE |
 | Notifications | Rows are the email outbox; the worker sends with exponential backoff (max 6 tries). Token links are never shown in-app. |
-| Worker | APScheduler in its own process; each job holds a Postgres advisory lock and is idempotent; all jobs run once at start-up to catch up |
+| Worker | Same job functions, two triggers: locally an APScheduler worker process; on AWS, EventBridge → `POST /api/internal/jobs/tick` (shared-secret header, constant-time compare, 404 when no key is set). Each job holds a Postgres advisory lock, is idempotent and records its finish in `job_runs`; the endpoint runs only jobs past their interval. Email batches are capped at 25 per run to keep each call short |
 | Series | `dateutil.rrule` evaluated in the series' stored `tz`; occurrences validated with the horizon replacing `max_advance_days`; series are for meeting rooms only |
 | Waitlist | An offer is a real booking with status `held`, created in the cancellation's transaction; accept → `confirmed`; expiry → next eligible entry |
 | Reports | Utilization = booked ÷ (open hours − maintenance); late cancel = owner cancelled inside the cutoff |
@@ -81,7 +81,7 @@ Department admins (HOD) can do the same for every lab in their department, appoi
 ```
 relay/
   spec.md  plan.md  README.md  instruments_list
-  docker-compose.yml  docker-compose.prod.yml  .env.example  .github/workflows/ci.yml
+  docker-compose.yml (local dev)  amplify.yml (Amplify build)  .github/workflows/ci.yml
   backend/
     requirements.txt  pyproject.toml  Dockerfile  alembic.ini  alembic/versions/0001_initial.py
     seed/institute.yaml  scripts/seed.py
@@ -94,9 +94,9 @@ relay/
       worker/     jobs.py  main.py
     tests/        test_permissions  test_rules  test_series (pure)  + *_db.py (Postgres)
   frontend/
-    Dockerfile (build → Caddy)  Caddyfile  src/{api,auth,time,types}.ts(x)  src/components  src/pages
-  deploy/  initdb/10-test-db.sql  backup.sh
-  docs/    operations.md  demo-script.md
+    src/{api,auth,time,types}.ts(x)  src/components  src/pages   (built by Amplify)
+  deploy/  aws/{backend.yml, deploy-backend.sh, relay.env.example, amplify-rewrites.json, amplify-headers.yml}  initdb/ (local)
+  docs/    deploy-aws.md  operations.md  demo-script.md
 ```
 
 Rule: routers stay thin. Every service that touches bookings calls `permissions.require_book` / `require_manage` first.
@@ -106,7 +106,7 @@ Rule: routers stay thin. Every service that touches bookings calls `permissions.
 ## 2. Milestones
 
 ### M1: Foundation
-- [x] Repo layout, settings from env, `.env.example`, no secrets in the repo
+- [x] Repo layout, settings from env, no secrets in the repo (`deploy/aws/relay.env` is git-ignored)
 - [x] Alembic migration: extensions, all tables, exclusion constraint, partial unique index, append-only audit trigger
 - [x] Auth: register, verify email, login/logout, `/auth/me`, password reset, sessions + CSRF, rate limits
 - [x] Departments, labs, memberships, verification queue
@@ -152,12 +152,13 @@ Rule: routers stay thin. Every service that touches bookings calls `permissions.
 - **Tests:** [x] offer/accept/expiry/ineligible · [x] report numbers on a hand-computed fixture · [x] visibility
 
 ### M7: Hardening and deployment
-- [x] Production compose, Caddy with HTTPS and security headers, nightly backup with retention, `docs/operations.md`, `docs/demo-script.md`
-- [x] Production stack built and run locally: HTTPS with an HTTP→HTTPS redirect, `Secure` session cookie, HSTS, no dev tokens, login and seed working, first backup written
-- [x] Hosting decided (Q7, option B); `docs/deploy-vm.md` + `deploy/setup-server.sh`
-- [ ] **You:** claim the Student Pack credits, create the droplet, get SMTP details, run the setup script
-- [ ] Smoke-test the live site (health, login, registration email, nightly backup)
-- [x] **Run the full suite against Postgres** (`docker compose exec api pytest -q`): 358 passed. The first run found three bugs, all fixed:
+- [x] ~~Production compose with Caddy and nightly `pg_dump`~~ replaced by AWS on 2026-10-27; the VM files were removed. The local production run had verified HTTPS, a `Secure` cookie, HSTS and no dev tokens, and those settings carry over (Amplify headers, `RELAY_COOKIE_SECURE=true`)
+- [x] Hosting decided (Q7: AWS Amplify + App Runner + RDS + EventBridge); `deploy/aws/*`, `amplify.yml`, `docs/deploy-aws.md`
+- [x] Job endpoint for EventBridge (`/api/internal/jobs/tick`, migration `0002_job_runs`) with tests; seed-on-start option; optional CORS fallback (`RELAY_CORS_ORIGINS` / `VITE_API_BASE`)
+- [x] `backend.yml` passes cfn-lint (ap-south-1, us-east-1); SPA rewrite rule checked against app and asset paths
+- [ ] **You:** AWS account + budget alert, AWS CLI, Amplify app from GitHub, run `deploy-backend.sh`, paste the rewrites (docs/deploy-aws.md)
+- [ ] Smoke-test on AWS: `/health` through Amplify, login survives a reload (proxy cookies), job ticks every minute in App Runner logs, registration email
+- [x] **Run the full suite against Postgres** (`docker compose exec api pytest -q`): 359 passed (incl. the job endpoint). The first run found three bugs, all fixed:
   - `alembic` couldn't import `app` in the container → `prepend_sys_path = .` in `alembic.ini`
   - Pydantic's `EmailStr` rejects reserved domains such as `.test`, so **no seeded account could sign in** → plain format check (`schemas.Email`)
   - `FOR UPDATE` on joined-eager queries is refused by Postgres → lock only the main table (`of=`)

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Download, Table2 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { api, errorMessage, qs } from "../api";
+import { api, apiUrl, errorMessage, qs } from "../api";
 import { useAuth } from "../auth";
 import { Alert, Card, Empty, Field, Input, PageHeader, Select, Skeleton, Stat } from "../components/ui";
 import { fmtDay, iso, localDate, zoned } from "../time";
@@ -44,8 +44,8 @@ export function ReportsPage() {
       <PageHeader title="Reports" subtitle={rep.data?.scope === "own" ? "Your own booking history." : "Usage of the resources you manage."}
         actions={rep.data && (
           <>
-            <a href={`/api/v1/reports/usage.csv${qs(params)}`} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2"><Download className="size-4" aria-hidden />Summary CSV</a>
-            <a href={`/api/v1/reports/usage.csv${qs({ ...params, raw: true })}`} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2"><Download className="size-4" aria-hidden />All bookings CSV</a>
+            <a href={apiUrl(`/reports/usage.csv${qs(params)}`)} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2"><Download className="size-4" aria-hidden />Summary CSV</a>
+            <a href={apiUrl(`/reports/usage.csv${qs({ ...params, raw: true })}`)} className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-line bg-surface px-4 text-sm font-medium hover:bg-surface-2"><Download className="size-4" aria-hidden />All bookings CSV</a>
           </>
         )} />
 

@@ -1,54 +1,50 @@
-# Operations runbook
+# Operations runbook (AWS)
 
-This is for whoever owns Relay after the course (plan Q7: the pilot department's admin). It assumes one Linux VM with Docker installed and a DNS name pointing at it.
+This is for whoever runs Relay after the course (plan Q7). Setting it up is covered in [`deploy-aws.md`](deploy-aws.md).
 
-## First deploy
+## Where things are
 
-```sh
-git clone <repo> relay && cd relay
-cp .env.example .env              # fill in RELAY_DOMAIN, POSTGRES_PASSWORD, SMTP_*
-docker compose -f docker-compose.prod.yml --env-file .env up -d --build
-docker compose -f docker-compose.prod.yml exec api python -m scripts.seed --no-demo   # optional: departments/labs only
+| What | Where in the AWS console |
+|---|---|
+| Frontend builds and deploys | **Amplify** → the app → build history |
+| API and its logs | **App Runner** → `relay-api` → Logs (also in **CloudWatch Logs**) |
+| Database and backups | **RDS** → the `relay` database → Maintenance & backups |
+| Background job schedule | **EventBridge** → Rules → the `relay-backend-JobsSchedule…` rule |
+| Everything above as one unit | **CloudFormation** → stack `relay-backend` |
+
+## Deploying changes
+
+- **Frontend:** push to GitHub `main`. Amplify rebuilds automatically.
+- **Backend:** `bash deploy/aws/deploy-backend.sh` from the repo, in Git Bash. It builds a new image, and App Runner rolls over to it; database migrations run on start.
+
+## First super admin (when not using demo data)
+
+Register normally on the site, then connect to the database (host is in the stack outputs; user `relay`; password is `DB_PASSWORD` in `deploy/aws/relay.env`; TLS required) and run:
+
+```sql
+UPDATE users SET is_superadmin = true WHERE email = 'you@institute.ac.in';
 ```
 
-Caddy gets a TLS certificate for `RELAY_DOMAIN` automatically, so ports 80 and 443 must be reachable. Check that it's up with `curl https://$RELAY_DOMAIN/health`. It should return `{"status":"ok"}`.
+Everything after that happens in the app's **Admin** page.
 
-Create the first super admin by registering normally, then promote the account in the database:
+## Backups and restore
 
-```sh
-docker compose -f docker-compose.prod.yml exec db psql -U relay -c "UPDATE users SET is_superadmin = true WHERE email = 'you@institute.ac.in';"
-```
+RDS takes an automatic daily backup (02:00–02:30 IST) and keeps it for **7 days**, with point-in-time recovery inside that window. Deleting the stack leaves a final snapshot.
 
-Everything after that happens in the app's **Admin** page: create departments, appoint department admins, and create labs with their professor.
+**Restore:**
+1. RDS → Automated backups (or Snapshots) → **Restore to point in time**, into a new instance.
+2. Point the app at it, e.g. by temporarily editing `RELAY_DATABASE_URL` in App Runner → Configuration.
 
-## Updating
+Rehearse this once a term. A local drill of the same dump-and-restore path passed: identical row counts, constraints and triggers intact.
 
-```sh
-git pull
-docker compose -f docker-compose.prod.yml --env-file .env up -d --build
-```
+## Health and logs
 
-The API applies database migrations on start (`alembic upgrade head`).
-
-## Backups
-
-The `backup` service writes `relay-YYYYMMDD-HHMM.dump` to `BACKUP_DIR` every night at 02:30 and keeps 14 days. **Copy that folder off the machine**, for example with a nightly `rclone copy` or `rsync` cron job to institute storage. A backup that lives only on the same disk is not a backup.
-
-### Restore (test this once a term)
-
-```sh
-docker compose -f docker-compose.prod.yml stop api worker
-docker compose -f docker-compose.prod.yml exec -T db pg_restore -U relay -d relay --clean --if-exists < backups/relay-20261101-0230.dump
-docker compose -f docker-compose.prod.yml start api worker
-```
-
-## Logs and health
-
-- `docker compose -f docker-compose.prod.yml logs -f api worker` shows one JSON line per request or job.
-- Email failures are retried up to six times with backoff. To see what's stuck:
+- `https://<app address>/health` → `{"status":"ok"}`. This checks Amplify, the proxy, App Runner and the database in one go.
+- App Runner logs: one JSON line per request. The scheduler shows up as `POST /api/internal/jobs/tick` every minute.
+- Emails that keep failing:
   `SELECT id, user_id, type, email_attempts, last_email_error FROM notifications WHERE emailed_at IS NULL;`
-- The audit log is append-only, enforced by a database trigger:
-  `SELECT * FROM audit_log ORDER BY id DESC LIMIT 50;`
+- When each background job last ran: `SELECT * FROM job_runs ORDER BY last_finished_at;`
+- The audit log is append-only (enforced by a database trigger): `SELECT * FROM audit_log ORDER BY id DESC LIMIT 50;`
 
 ## Common requests
 
@@ -57,4 +53,9 @@ docker compose -f docker-compose.prod.yml start api worker
 | A new professor joins | Department admin → Admin → New lab (or add them as professor to an existing lab) |
 | A student needs their lab's instruments | Their professor adds them on **My labs** |
 | An instrument breaks | Professor → resource → Settings → status "Under maintenance", or block a time range |
-| Someone left the institute | `UPDATE users SET is_active = false WHERE email = '…';` signs them out and blocks all booking |
+| Someone left the institute | `UPDATE users SET is_active = false WHERE email = '…';` signs them out and blocks booking |
+| Stop everything (and the bill) | CloudFormation → delete `relay-backend` (keeps a final DB snapshot), and delete the Amplify app |
+
+## Local development
+
+Unchanged: `docker compose up --build` runs everything locally, with Mailpit for email (see the README).

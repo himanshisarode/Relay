@@ -22,7 +22,7 @@ os.environ.update({
 
 from sqlalchemy import text  # noqa: E402
 
-TABLES = ("audit_log, notifications, booking_attendees, bookings, waitlist_entries, booking_series, access_grants, "
+TABLES = ("job_runs, audit_log, notifications, booking_attendees, bookings, waitlist_entries, booking_series, access_grants, "
           "access_requests, resources, lab_members, department_members, labs, departments, auth_tokens, sessions, users")
 
 

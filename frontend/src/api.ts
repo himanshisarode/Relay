@@ -11,6 +11,13 @@ export class ApiError extends Error {
   }
 }
 
+// Empty (default): same origin, so Amplify proxies /api to the backend. Set VITE_API_BASE only when the API is
+// served from its own subdomain, e.g. https://api.example.org (backend RELAY_CORS_ORIGINS must then list the app).
+const API_BASE = ((import.meta.env.VITE_API_BASE as string | undefined) ?? "").replace(/\/$/, "");
+
+/** Absolute URL for links the browser opens directly (e.g. CSV downloads). */
+export const apiUrl = (path: string) => `${API_BASE}/api/v1${path}`;
+
 let csrf = "";
 export function setCsrf(token: string) {
   csrf = token;
@@ -25,10 +32,10 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
   const headers: Record<string, string> = { Accept: "application/json" };
   if (opts.body !== undefined) headers["Content-Type"] = "application/json";
   if (method !== "GET") headers["X-CSRF-Token"] = csrf || cookieCsrf();
-  const res = await fetch(`/api/v1${path}`, {
+  const res = await fetch(`${API_BASE}/api/v1${path}`, {
     method,
     headers,
-    credentials: "same-origin",
+    credentials: API_BASE ? "include" : "same-origin",
     body: opts.body === undefined ? undefined : JSON.stringify(opts.body),
   });
   if (res.status === 204) return undefined as T;

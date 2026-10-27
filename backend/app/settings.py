@@ -18,6 +18,13 @@ class Settings(BaseSettings):
     # Dev only: return verification / reset tokens in API responses so the flow works without SMTP.
     dev_expose_tokens: bool = False
     rate_limit_enabled: bool = True
+    # Shared secret for POST /api/internal/jobs/tick (AWS EventBridge). Empty disables the endpoint.
+    cron_key: str = ""
+    # On container start: "demo" loads seed + demo activity, "org" loads departments/labs/resources only.
+    seed_on_start: str = ""
+    # Comma-separated browser origins allowed to call the API with cookies. Only needed when the frontend talks to
+    # the API on a different (sub)domain instead of through the Amplify /api proxy, e.g. "https://app.example.org".
+    cors_origins: str = ""
 
     smtp_host: str = "localhost"
     smtp_port: int = 1025

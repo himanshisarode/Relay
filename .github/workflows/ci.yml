@@ -31,9 +31,12 @@ jobs:
       - run: npx tsc -b
       - run: npx vitest run
       - run: npx vite build
-  docker:
+  deploy-files:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker compose -f docker-compose.prod.yml build
-        env: { RELAY_DOMAIN: ci.local, POSTGRES_PASSWORD: ci, SMTP_HOST: localhost }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install cfn-lint
+      - run: cfn-lint --regions ap-south-1 -- deploy/aws/backend.yml
+      - run: docker build --platform linux/amd64 -t relay-backend backend

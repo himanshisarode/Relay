@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* Design tokens. Components use these roles (bg-surface, text-muted, ...) so dark mode is one swap here. */
+:root {
+  color-scheme: light;
+  --bg: #f6f7f6;
+  --surface: #ffffff;
+  --surface-2: #f1f3f2;
+  --ink: #111827;
+  --muted: #5b6472;
+  --faint: #8a93a0;
+  --line: #e3e6e8;
+  --brand: #0f766e;
+  --brand-strong: #0b5f58;
+  --brand-soft: #e6f4f2;
+  --brand-ink: #ffffff;
+  --ok: #15803d;
+  --ok-soft: #e8f6ec;
+  --warn: #a16207;
+  --warn-soft: #fdf5e1;
+  --bad: #b91c1c;
+  --bad-soft: #fdecec;
+  --info: #1d4ed8;
+  --info-soft: #e8efff;
+  --chart-1: #0d9488;
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.05), 0 1px 3px rgb(16 24 40 / 0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f1214;
+    --surface: #171b1e;
+    --surface-2: #1f2427;
+    --ink: #eef1f3;
+    --muted: #a8b0b8;
+    --faint: #7b848d;
+    --line: #2a3035;
+    --brand: #2bb3a3;
+    --brand-strong: #46c9b9;
+    --brand-soft: #12302d;
+    --brand-ink: #062320;
+    --ok: #4ade80;
+    --ok-soft: #12291b;
+    --warn: #fbbf24;
+    --warn-soft: #2d2410;
+    --bad: #f87171;
+    --bad-soft: #351717;
+    --info: #93b4ff;
+    --info-soft: #18223a;
+    --chart-1: #2a9d8f;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1214; --surface: #171b1e; --surface-2: #1f2427; --ink: #eef1f3; --muted: #a8b0b8; --faint: #7b848d;
+  --line: #2a3035; --brand: #2bb3a3; --brand-strong: #46c9b9; --brand-soft: #12302d; --brand-ink: #062320;
+  --ok: #4ade80; --ok-soft: #12291b; --warn: #fbbf24; --warn-soft: #2d2410; --bad: #f87171; --bad-soft: #351717;
+  --info: #93b4ff; --info-soft: #18223a; --chart-1: #2a9d8f; --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+}
+
+@theme inline {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --shadow-card: var(--shadow);
+}
+
+html, body { background: var(--bg); color: var(--ink); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; font-feature-settings: "cv11", "ss01"; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+
+/* FullCalendar, tuned to the tokens */
+.fc {
+  --fc-border-color: var(--line);
+  --fc-page-bg-color: var(--surface);
+  --fc-neutral-bg-color: var(--surface-2);
+  --fc-today-bg-color: color-mix(in srgb, var(--brand) 6%, transparent);
+  --fc-now-indicator-color: var(--bad);
+  --fc-highlight-color: color-mix(in srgb, var(--brand) 18%, transparent);
+  font-size: 0.8125rem;
+}
+.fc .fc-col-header-cell-cushion, .fc .fc-timegrid-slot-label-cushion { color: var(--muted); font-weight: 500; }
+.fc .fc-timegrid-slot { height: 2.1rem; }
+.fc .fc-event { border-radius: 6px; padding: 1px 3px; border-width: 0 0 0 3px; box-shadow: none; }
+.fc .ev-mine { background: var(--brand); border-color: var(--brand-strong); color: var(--brand-ink); }
+.fc .ev-other { background: var(--surface-2); border-color: var(--faint); color: var(--muted); }
+.fc .ev-maint { background: repeating-linear-gradient(135deg, var(--warn-soft) 0 6px, transparent 6px 12px), var(--surface-2); border-color: var(--warn); color: var(--warn); }
+.fc .ev-held { background: var(--info-soft); border-color: var(--info); color: var(--info); }
+.fc .fc-event .fc-event-main { color: inherit; }
+.fc .fc-non-business { background: color-mix(in srgb, var(--surface-2) 70%, transparent); }

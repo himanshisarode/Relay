@@ -1,0 +1,1129 @@
+# Relay seed data: departments, labs, professors, members and resources.
+# Generated from ../../instruments_list (all names fictional), then hand-editable.
+#   policy:  lab_only | department | institute_approval | institute_open
+#   profile: booking-rule preset from `profiles` (open_time == close_time means open 24 h)
+# Every seeded account uses the dev password in seed.py; never use these in production.
+profiles:
+  standard:
+    slot_granularity_min: 30
+    min_duration_min: 30
+    max_duration_min: 240
+    open_time: '08:00'
+    close_time: '20:00'
+    max_advance_days: 14
+    min_notice_min: 30
+    weekly_quota_min: 600
+    cancellation_cutoff_min: 120
+  long_run:
+    slot_granularity_min: 60
+    min_duration_min: 120
+    max_duration_min: 720
+    open_time: '07:00'
+    close_time: '22:00'
+    max_advance_days: 30
+    min_notice_min: 120
+    weekly_quota_min: 1440
+    cancellation_cutoff_min: 1440
+  compute:
+    slot_granularity_min: 60
+    min_duration_min: 60
+    max_duration_min: 1440
+    open_time: '00:00'
+    close_time: '00:00'
+    max_advance_days: 14
+    min_notice_min: 0
+    weekly_quota_min: 2880
+    cancellation_cutoff_min: 60
+  meeting:
+    slot_granularity_min: 30
+    min_duration_min: 30
+    max_duration_min: 180
+    open_time: '08:00'
+    close_time: '20:00'
+    max_advance_days: 60
+    min_notice_min: 0
+    weekly_quota_min: null
+    cancellation_cutoff_min: 60
+departments:
+- code: PHY
+  name: Department of Physics
+  building: PHY Block
+  dept_admin:
+    name: Prof. Aditya Verma
+    email: aditya.verma@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Quantum Materials Lab
+    professor:
+      name: Prof. Pooja Rao
+      email: pooja.rao@relay.test
+    members:
+    - name: Priya Joshi
+      email: priya.joshi@relay.test
+      position: PhD scholar
+    - name: Varun Kulkarni
+      email: varun.kulkarni@relay.test
+      position: MTech student
+    - name: Mira Subramanian
+      email: mira.subramanian@relay.test
+      position: Project associate
+    resources:
+    - name: Cryostat A (4K)
+      type: instrument
+      policy: department
+      profile: long_run
+      location: PHY Block, Room PHY-101
+    - name: Cryostat B (Dilution Fridge)
+      type: instrument
+      policy: lab_only
+      profile: long_run
+      location: PHY Block, Room PHY-102
+    - name: Vibrating Sample Magnetometer
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: PHY Block, Room PHY-103
+    - name: Four-Probe Transport Station
+      type: instrument
+      policy: department
+      profile: standard
+      location: PHY Block, Room PHY-104
+    - name: Lab Meeting Room PH-101
+      type: meeting_room
+      policy: lab_only
+      profile: meeting
+      location: PHY Block, Room PHY-105
+  - name: Soft Matter Lab
+    professor:
+      name: Prof. Pranav Pillai
+      email: pranav.pillai@relay.test
+    members:
+    - name: Ritu Shetty
+      email: ritu.shetty@relay.test
+      position: PhD scholar
+    - name: Neha Krishnan
+      email: neha.krishnan@relay.test
+      position: MTech student
+    - name: Abhishek Sharma
+      email: abhishek.sharma@relay.test
+      position: Project associate
+    resources:
+    - name: Confocal Microscope
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: PHY Block, Room PHY-106
+    - name: Rheometer
+      type: instrument
+      policy: department
+      profile: standard
+      location: PHY Block, Room PHY-107
+    - name: Dynamic Light Scattering Unit
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: PHY Block, Room PHY-108
+  - name: Optics and Photonics Lab
+    professor:
+      name: Prof. Tenzin Kapoor
+      email: tenzin.kapoor@relay.test
+    members:
+    - name: Gaurav Rao
+      email: gaurav.rao@relay.test
+      position: PhD scholar
+    - name: Kavya Patil
+      email: kavya.patil@relay.test
+      position: MTech student
+    - name: Siddharth Thomas
+      email: siddharth.thomas@relay.test
+      position: Project associate
+    resources:
+    - name: Femtosecond Laser Bench
+      type: instrument
+      policy: lab_only
+      profile: standard
+      location: PHY Block, Room PHY-109
+    - name: Raman Spectrometer
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: PHY Block, Room PHY-110
+    - name: Optical Table 2
+      type: instrument
+      policy: department
+      profile: standard
+      location: PHY Block, Room PHY-111
+- code: CSA
+  name: Department of Computer Science and Automation
+  building: CSA Block
+  dept_admin:
+    name: Prof. Rohan Iyer
+    email: rohan.iyer@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Machine Learning Lab
+    professor:
+      name: Prof. Priya Prasad
+      email: priya.prasad@relay.test
+    members:
+    - name: Siddharth Krishnan
+      email: siddharth.krishnan@relay.test
+      position: PhD scholar
+    - name: Priya Dutta
+      email: priya.dutta@relay.test
+      position: MTech student
+    - name: Nandini Banerjee
+      email: nandini.banerjee@relay.test
+      position: Project associate
+    resources:
+    - name: GPU Server gpu-01 (4x A100)
+      type: instrument
+      policy: institute_approval
+      profile: compute
+      location: CSA Block, Room CSA-101
+    - name: GPU Server gpu-02 (8x H100)
+      type: instrument
+      policy: lab_only
+      profile: compute
+      location: CSA Block, Room CSA-102
+    - name: GPU Server gpu-03 (4x L40S)
+      type: instrument
+      policy: institute_approval
+      profile: compute
+      location: CSA Block, Room CSA-103
+    - name: Seminar Room CSA-201
+      type: meeting_room
+      policy: department
+      profile: meeting
+      location: CSA Block, Room CSA-104
+  - name: Systems and Security Lab
+    professor:
+      name: Prof. Ananya Sharma
+      email: ananya.sharma@relay.test
+    members:
+    - name: Rohan Naidu
+      email: rohan.naidu@relay.test
+      position: PhD scholar
+    - name: Isha Sharma
+      email: isha.sharma@relay.test
+      position: MTech student
+    - name: Kavya Naidu
+      email: kavya.naidu@relay.test
+      position: Project associate
+    resources:
+    - name: Test Cluster (16 nodes)
+      type: instrument
+      policy: lab_only
+      profile: compute
+      location: CSA Block, Room CSA-105
+    - name: Network Emulation Testbed
+      type: instrument
+      policy: department
+      profile: compute
+      location: CSA Block, Room CSA-106
+    - name: FPGA Development Board Bench
+      type: instrument
+      policy: department
+      profile: standard
+      location: CSA Block, Room CSA-107
+  - name: Robotics Lab
+    professor:
+      name: Prof. Suresh Shah
+      email: suresh.shah@relay.test
+    members:
+    - name: Vikram Prasad
+      email: vikram.prasad@relay.test
+      position: PhD scholar
+    - name: Varun Sharma
+      email: varun.sharma@relay.test
+      position: MTech student
+    - name: Joseph Mehta
+      email: joseph.mehta@relay.test
+      position: Project associate
+    resources:
+    - name: 6-DOF Robotic Arm
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: CSA Block, Room CSA-108
+    - name: Motion Capture Arena
+      type: instrument
+      policy: department
+      profile: standard
+      location: CSA Block, Room CSA-109
+    - name: Quadrotor Flight Cage
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: CSA Block, Room CSA-110
+- code: ECE
+  name: Department of Electrical Communication Engineering
+  building: ECE Block
+  dept_admin:
+    name: Prof. Shreya Das
+    email: shreya.das@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Wireless Systems Lab
+    professor:
+      name: Prof. Vikram Kapoor
+      email: vikram.kapoor@relay.test
+    members:
+    - name: Nandini Rao
+      email: nandini.rao@relay.test
+      position: PhD scholar
+    - name: Isha Bhat
+      email: isha.bhat@relay.test
+      position: MTech student
+    - name: Ananya Patil
+      email: ananya.patil@relay.test
+      position: Project associate
+    resources:
+    - name: Anechoic Chamber
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: ECE Block, Room ECE-101
+    - name: Vector Network Analyzer
+      type: instrument
+      policy: department
+      profile: standard
+      location: ECE Block, Room ECE-102
+    - name: Spectrum Analyzer (26 GHz)
+      type: instrument
+      policy: department
+      profile: standard
+      location: ECE Block, Room ECE-103
+    - name: Software-Defined Radio Bench
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: ECE Block, Room ECE-104
+  - name: VLSI and Circuits Lab
+    professor:
+      name: Prof. Farah Chatterjee
+      email: farah.chatterjee@relay.test
+    members:
+    - name: Karthik Bose
+      email: karthik.bose@relay.test
+      position: PhD scholar
+    - name: Zoya Reddy
+      email: zoya.reddy@relay.test
+      position: MTech student
+    - name: Lakshmi Reddy
+      email: lakshmi.reddy@relay.test
+      position: Project associate
+    resources:
+    - name: Probe Station
+      type: instrument
+      policy: lab_only
+      profile: standard
+      location: ECE Block, Room ECE-105
+    - name: Logic Analyzer Bench
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: ECE Block, Room ECE-106
+    - name: Mixed-Signal Oscilloscope Station
+      type: instrument
+      policy: department
+      profile: standard
+      location: ECE Block, Room ECE-107
+  - name: Photonics Lab
+    professor:
+      name: Prof. Meera Dutta
+      email: meera.dutta@relay.test
+    members:
+    - name: Anjali Fernandes
+      email: anjali.fernandes@relay.test
+      position: PhD scholar
+    - name: Farah Gupta
+      email: farah.gupta@relay.test
+      position: MTech student
+    - name: Karthik Shah
+      email: karthik.shah@relay.test
+      position: Project associate
+    resources:
+    - name: Optical Spectrum Analyzer
+      type: instrument
+      policy: department
+      profile: standard
+      location: ECE Block, Room ECE-108
+    - name: Fibre Splicing Station
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: ECE Block, Room ECE-109
+- code: MECH
+  name: Department of Mechanical Engineering
+  building: MECH Block
+  dept_admin:
+    name: Prof. Kavya Kulkarni
+    email: kavya.kulkarni@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Additive Manufacturing Lab
+    professor:
+      name: Prof. Lakshmi Rao
+      email: lakshmi.rao@relay.test
+    members:
+    - name: Lakshmi Prasad
+      email: lakshmi.prasad@relay.test
+      position: PhD scholar
+    - name: Shreya Reddy
+      email: shreya.reddy@relay.test
+      position: MTech student
+    - name: Ananya Naidu
+      email: ananya.naidu@relay.test
+      position: Project associate
+    resources:
+    - name: Metal 3D Printer
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MECH Block, Room MECH-101
+    - name: Polymer 3D Printer
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MECH Block, Room MECH-102
+    - name: Resin 3D Printer
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MECH Block, Room MECH-103
+    - name: Post-Processing Oven
+      type: instrument
+      policy: department
+      profile: long_run
+      location: MECH Block, Room MECH-104
+  - name: Fluid Dynamics Lab
+    professor:
+      name: Prof. Priya Thomas
+      email: priya.thomas@relay.test
+    members:
+    - name: Pranav Varma
+      email: pranav.varma@relay.test
+      position: PhD scholar
+    - name: Neha Kamath
+      email: neha.kamath@relay.test
+      position: MTech student
+    - name: Zoya Joshi
+      email: zoya.joshi@relay.test
+      position: Project associate
+    resources:
+    - name: Low-Speed Wind Tunnel
+      type: instrument
+      policy: department
+      profile: long_run
+      location: MECH Block, Room MECH-105
+    - name: Particle Image Velocimetry Rig
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MECH Block, Room MECH-106
+    - name: Water Channel
+      type: instrument
+      policy: department
+      profile: long_run
+      location: MECH Block, Room MECH-107
+  - name: Manufacturing Lab
+    professor:
+      name: Prof. Arjun Banerjee
+      email: arjun.banerjee@relay.test
+    members:
+    - name: Neha Mukherjee
+      email: neha.mukherjee@relay.test
+      position: PhD scholar
+    - name: Rahul Prasad
+      email: rahul.prasad@relay.test
+      position: MTech student
+    - name: Imran Nair
+      email: imran.nair@relay.test
+      position: Project associate
+    resources:
+    - name: 5-Axis CNC Mill
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MECH Block, Room MECH-108
+    - name: Laser Cutter
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MECH Block, Room MECH-109
+    - name: Universal Testing Machine
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MECH Block, Room MECH-110
+- code: CHEM
+  name: Department of Inorganic and Physical Chemistry
+  building: CHEM Block
+  dept_admin:
+    name: Prof. Leela Ahmed
+    email: leela.ahmed@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Spectroscopy Lab
+    professor:
+      name: Prof. Zoya Sen
+      email: zoya.sen@relay.test
+    members:
+    - name: Anjali Saxena
+      email: anjali.saxena@relay.test
+      position: PhD scholar
+    - name: Suresh Das
+      email: suresh.das@relay.test
+      position: MTech student
+    - name: Deepak Chatterjee
+      email: deepak.chatterjee@relay.test
+      position: Project associate
+    resources:
+    - name: 600 MHz NMR Spectrometer
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: CHEM Block, Room CHEM-101
+    - name: UV-Vis Spectrophotometer
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: CHEM Block, Room CHEM-102
+    - name: FTIR Spectrometer
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: CHEM Block, Room CHEM-103
+    - name: Fluorimeter
+      type: instrument
+      policy: department
+      profile: standard
+      location: CHEM Block, Room CHEM-104
+  - name: Electrochemistry Lab
+    professor:
+      name: Prof. Manoj Agarwal
+      email: manoj.agarwal@relay.test
+    members:
+    - name: Pooja Chatterjee
+      email: pooja.chatterjee@relay.test
+      position: PhD scholar
+    - name: Kiran Chatterjee
+      email: kiran.chatterjee@relay.test
+      position: MTech student
+    - name: Tenzin Thomas
+      email: tenzin.thomas@relay.test
+      position: Project associate
+    resources:
+    - name: Potentiostat Station 1
+      type: instrument
+      policy: department
+      profile: standard
+      location: CHEM Block, Room CHEM-105
+    - name: Potentiostat Station 2
+      type: instrument
+      policy: department
+      profile: standard
+      location: CHEM Block, Room CHEM-106
+    - name: Glovebox (Argon)
+      type: instrument
+      policy: lab_only
+      profile: standard
+      location: CHEM Block, Room CHEM-107
+  - name: Crystallography Facility
+    professor:
+      name: Prof. Harish Verma
+      email: harish.verma@relay.test
+    members:
+    - name: Mira Pillai
+      email: mira.pillai@relay.test
+      position: PhD scholar
+    - name: Shreya Desai
+      email: shreya.desai@relay.test
+      position: MTech student
+    - name: Neha Sen
+      email: neha.sen@relay.test
+      position: Project associate
+    resources:
+    - name: Single-Crystal X-ray Diffractometer
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: CHEM Block, Room CHEM-108
+    - name: Powder X-ray Diffractometer
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: CHEM Block, Room CHEM-109
+- code: ORGC
+  name: Department of Organic Chemistry
+  building: ORGC Block
+  dept_admin:
+    name: Prof. Mira Iyer
+    email: mira.iyer@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Synthesis and Analysis Lab
+    professor:
+      name: Prof. Arjun Verma
+      email: arjun.verma@relay.test
+    members:
+    - name: Varun Mukherjee
+      email: varun.mukherjee@relay.test
+      position: PhD scholar
+    - name: Aditya Desai
+      email: aditya.desai@relay.test
+      position: MTech student
+    - name: Farah Fernandes
+      email: farah.fernandes@relay.test
+      position: Project associate
+    resources:
+    - name: HPLC System
+      type: instrument
+      policy: department
+      profile: standard
+      location: ORGC Block, Room ORGC-101
+    - name: GC-MS
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: ORGC Block, Room ORGC-102
+    - name: LC-MS (Q-TOF)
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: ORGC Block, Room ORGC-103
+    - name: Rotary Evaporator Bank
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: ORGC Block, Room ORGC-104
+    - name: Microwave Reactor
+      type: instrument
+      policy: department
+      profile: standard
+      location: ORGC Block, Room ORGC-105
+- code: BIO
+  name: Department of Biochemistry
+  building: BIO Block
+  dept_admin:
+    name: Prof. Joseph Shetty
+    email: joseph.shetty@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Cell Imaging Lab
+    professor:
+      name: Prof. Kavya Banerjee
+      email: kavya.banerjee@relay.test
+    members:
+    - name: Deepak Bose
+      email: deepak.bose@relay.test
+      position: PhD scholar
+    - name: Meera Mukherjee
+      email: meera.mukherjee@relay.test
+      position: MTech student
+    - name: Imran Gupta
+      email: imran.gupta@relay.test
+      position: Project associate
+    resources:
+    - name: Fluorescence Microscope
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: BIO Block, Room BIO-101
+    - name: Live-Cell Imaging Incubator Scope
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: BIO Block, Room BIO-102
+    - name: Flow Cytometer
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: BIO Block, Room BIO-103
+    - name: Lab Meeting Room BC-105
+      type: meeting_room
+      policy: lab_only
+      profile: meeting
+      location: BIO Block, Room BIO-104
+  - name: Protein Structure Lab
+    professor:
+      name: Prof. Ananya Verma
+      email: ananya.verma@relay.test
+    members:
+    - name: Joseph Kamath
+      email: joseph.kamath@relay.test
+      position: PhD scholar
+    - name: Deepak Pillai
+      email: deepak.pillai@relay.test
+      position: MTech student
+    - name: Joseph Agarwal
+      email: joseph.agarwal@relay.test
+      position: Project associate
+    resources:
+    - name: Ultracentrifuge
+      type: instrument
+      policy: department
+      profile: long_run
+      location: BIO Block, Room BIO-105
+    - name: FPLC System
+      type: instrument
+      policy: department
+      profile: standard
+      location: BIO Block, Room BIO-106
+    - name: Crystallization Robot
+      type: instrument
+      policy: lab_only
+      profile: long_run
+      location: BIO Block, Room BIO-107
+    - name: Circular Dichroism Spectrometer
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: BIO Block, Room BIO-108
+  - name: Genomics Core
+    professor:
+      name: Prof. Suresh Shetty
+      email: suresh.shetty@relay.test
+    members:
+    - name: Siddharth Chatterjee
+      email: siddharth.chatterjee@relay.test
+      position: PhD scholar
+    - name: Priya Saxena
+      email: priya.saxena@relay.test
+      position: MTech student
+    - name: Zoya Nair
+      email: zoya.nair@relay.test
+      position: Project associate
+    resources:
+    - name: qPCR Machine 1
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: BIO Block, Room BIO-109
+    - name: qPCR Machine 2
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: BIO Block, Room BIO-110
+    - name: Next-Gen Sequencer
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: BIO Block, Room BIO-111
+    - name: Gel Documentation System
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: BIO Block, Room BIO-112
+- code: MCB
+  name: Department of Microbiology and Cell Biology
+  building: MCB Block
+  dept_admin:
+    name: Prof. Joseph Dutta
+    email: joseph.dutta@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Microbial Imaging Lab
+    professor:
+      name: Prof. Leela Shetty
+      email: leela.shetty@relay.test
+    members:
+    - name: Tenzin Sharma
+      email: tenzin.sharma@relay.test
+      position: PhD scholar
+    - name: Nikhil Banerjee
+      email: nikhil.banerjee@relay.test
+      position: MTech student
+    - name: Arjun Nair
+      email: arjun.nair@relay.test
+      position: Project associate
+    resources:
+    - name: Super-Resolution Microscope
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MCB Block, Room MCB-101
+    - name: Light-Sheet Microscope
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MCB Block, Room MCB-102
+    - name: Anaerobic Chamber
+      type: instrument
+      policy: department
+      profile: standard
+      location: MCB Block, Room MCB-103
+    - name: Plate Reader
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MCB Block, Room MCB-104
+- code: MAT
+  name: Department of Materials Engineering
+  building: MAT Block
+  dept_admin:
+    name: Prof. Rohan Kulkarni
+    email: rohan.kulkarni@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Electron Microscopy Facility
+    professor:
+      name: Prof. Pranav Kamath
+      email: pranav.kamath@relay.test
+    members:
+    - name: Kavya Das
+      email: kavya.das@relay.test
+      position: PhD scholar
+    - name: Varun Fernandes
+      email: varun.fernandes@relay.test
+      position: MTech student
+    - name: Siddharth Murthy
+      email: siddharth.murthy@relay.test
+      position: Project associate
+    resources:
+    - name: SEM (Scanning Electron Microscope)
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MAT Block, Room MAT-101
+    - name: TEM (Transmission Electron Microscope)
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MAT Block, Room MAT-102
+    - name: FIB-SEM
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MAT Block, Room MAT-103
+    - name: Sputter Coater
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MAT Block, Room MAT-104
+  - name: Thin Films Lab
+    professor:
+      name: Prof. Neha Reddy
+      email: neha.reddy@relay.test
+    members:
+    - name: Zoya Iyer
+      email: zoya.iyer@relay.test
+      position: PhD scholar
+    - name: Karthik Shetty
+      email: karthik.shetty@relay.test
+      position: MTech student
+    - name: Swati Fernandes
+      email: swati.fernandes@relay.test
+      position: Project associate
+    resources:
+    - name: Tube Furnace (1200C)
+      type: instrument
+      policy: department
+      profile: long_run
+      location: MAT Block, Room MAT-105
+    - name: Pulsed Laser Deposition System
+      type: instrument
+      policy: lab_only
+      profile: long_run
+      location: MAT Block, Room MAT-106
+    - name: Spin Coater
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MAT Block, Room MAT-107
+    - name: Atomic Force Microscope
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MAT Block, Room MAT-108
+  - name: Mechanical Testing Lab
+    professor:
+      name: Prof. Joseph Sharma
+      email: joseph.sharma@relay.test
+    members:
+    - name: Arjun Hegde
+      email: arjun.hegde@relay.test
+      position: PhD scholar
+    - name: Arjun Joshi
+      email: arjun.joshi@relay.test
+      position: MTech student
+    - name: Gaurav Agarwal
+      email: gaurav.agarwal@relay.test
+      position: Project associate
+    resources:
+    - name: Nanoindenter
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: MAT Block, Room MAT-109
+    - name: Hardness Tester
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: MAT Block, Room MAT-110
+    - name: Fatigue Testing Rig
+      type: instrument
+      policy: department
+      profile: long_run
+      location: MAT Block, Room MAT-111
+- code: AERO
+  name: Department of Aerospace Engineering
+  building: AERO Block
+  dept_admin:
+    name: Prof. Arjun Sen
+    email: arjun.sen@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Propulsion Lab
+    professor:
+      name: Prof. Vikram Kamath
+      email: vikram.kamath@relay.test
+    members:
+    - name: Tanvi Rao
+      email: tanvi.rao@relay.test
+      position: PhD scholar
+    - name: Kavya Ahmed
+      email: kavya.ahmed@relay.test
+      position: MTech student
+    - name: Nandini Desai
+      email: nandini.desai@relay.test
+      position: Project associate
+    resources:
+    - name: Test Cell Slot
+      type: instrument
+      policy: lab_only
+      profile: long_run
+      location: AERO Block, Room AERO-101
+    - name: High-Speed Camera Rig
+      type: instrument
+      policy: department
+      profile: standard
+      location: AERO Block, Room AERO-102
+  - name: Flight Dynamics Lab
+    professor:
+      name: Prof. Rahul Subramanian
+      email: rahul.subramanian@relay.test
+    members:
+    - name: Priya Shetty
+      email: priya.shetty@relay.test
+      position: PhD scholar
+    - name: Tenzin Ghosh
+      email: tenzin.ghosh@relay.test
+      position: MTech student
+    - name: Joseph Kapoor
+      email: joseph.kapoor@relay.test
+      position: Project associate
+    resources:
+    - name: Flight Simulator Rig
+      type: instrument
+      policy: department
+      profile: standard
+      location: AERO Block, Room AERO-103
+    - name: Subsonic Wind Tunnel
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: AERO Block, Room AERO-104
+    - name: Structural Test Frame
+      type: instrument
+      policy: department
+      profile: standard
+      location: AERO Block, Room AERO-105
+- code: CNS
+  name: Centre for Neuroscience
+  building: CNS Block
+  dept_admin:
+    name: Prof. Pranav Mukherjee
+    email: pranav.mukherjee@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Systems Neuroscience Lab
+    professor:
+      name: Prof. Anjali Naidu
+      email: anjali.naidu@relay.test
+    members:
+    - name: Shreya Bose
+      email: shreya.bose@relay.test
+      position: PhD scholar
+    - name: Arjun Bhat
+      email: arjun.bhat@relay.test
+      position: MTech student
+    - name: Mira Murthy
+      email: mira.murthy@relay.test
+      position: Project associate
+    resources:
+    - name: Two-Photon Imaging Rig
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: CNS Block, Room CNS-101
+    - name: Electrophysiology Rig 1
+      type: instrument
+      policy: lab_only
+      profile: standard
+      location: CNS Block, Room CNS-102
+    - name: Electrophysiology Rig 2
+      type: instrument
+      policy: lab_only
+      profile: standard
+      location: CNS Block, Room CNS-103
+    - name: Behaviour Arena
+      type: instrument
+      policy: department
+      profile: standard
+      location: CNS Block, Room CNS-104
+    - name: Lab Meeting Room CNS-301
+      type: meeting_room
+      policy: lab_only
+      profile: meeting
+      location: CNS Block, Room CNS-105
+  - name: Neuroimaging Facility
+    professor:
+      name: Prof. Rohan Fernandes
+      email: rohan.fernandes@relay.test
+    members:
+    - name: Pranav Fernandes
+      email: pranav.fernandes@relay.test
+      position: PhD scholar
+    - name: Vikram Ahmed
+      email: vikram.ahmed@relay.test
+      position: MTech student
+    - name: Manoj Bhat
+      email: manoj.bhat@relay.test
+      position: Project associate
+    resources:
+    - name: EEG System
+      type: instrument
+      policy: institute_approval
+      profile: standard
+      location: CNS Block, Room CNS-106
+    - name: Eye Tracker Station
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: CNS Block, Room CNS-107
+- code: CES
+  name: Centre for Earth Sciences
+  building: CES Block
+  dept_admin:
+    name: Prof. Pranav Saxena
+    email: pranav.saxena@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Geochemistry Lab
+    professor:
+      name: Prof. Arjun Kulkarni
+      email: arjun.kulkarni@relay.test
+    members:
+    - name: Harish Patil
+      email: harish.patil@relay.test
+      position: PhD scholar
+    - name: Karthik Dutta
+      email: karthik.dutta@relay.test
+      position: MTech student
+    - name: Karthik Hegde
+      email: karthik.hegde@relay.test
+      position: Project associate
+    resources:
+    - name: ICP-MS
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: CES Block, Room CES-101
+    - name: Isotope Ratio Mass Spectrometer
+      type: instrument
+      policy: institute_approval
+      profile: long_run
+      location: CES Block, Room CES-102
+    - name: Rock Crusher and Sample Prep Station
+      type: instrument
+      policy: department
+      profile: standard
+      location: CES Block, Room CES-103
+    - name: Thin-Section Microscope
+      type: instrument
+      policy: institute_open
+      profile: standard
+      location: CES Block, Room CES-104
+- code: MATH
+  name: Department of Mathematics
+  building: MATH Block
+  dept_admin:
+    name: Prof. Tanvi Fernandes
+    email: tanvi.fernandes@relay.test
+    title: Chair / HOD
+  labs:
+  - name: Computational Mathematics Group
+    professor:
+      name: Prof. Pooja Verma
+      email: pooja.verma@relay.test
+    members:
+    - name: Gaurav Subramanian
+      email: gaurav.subramanian@relay.test
+      position: PhD scholar
+    - name: Aditya Varma
+      email: aditya.varma@relay.test
+      position: MTech student
+    - name: Meera Murthy
+      email: meera.murthy@relay.test
+      position: Project associate
+    resources:
+    - name: Compute Server math-01
+      type: instrument
+      policy: institute_open
+      profile: compute
+      location: MATH Block, Room MATH-101
+    - name: Compute Server math-02 (High Memory)
+      type: instrument
+      policy: department
+      profile: compute
+      location: MATH Block, Room MATH-102
+    - name: Seminar Room MA-110
+      type: meeting_room
+      policy: department
+      profile: meeting
+      location: MATH Block, Room MATH-103
+- code: CDS
+  name: Department of Computational and Data Sciences
+  building: CDS Block
+  dept_admin:
+    name: Prof. Tanvi Agarwal
+    email: tanvi.agarwal@relay.test
+    title: Chair / HOD
+  labs:
+  - name: HPC Facility
+    professor:
+      name: Prof. Vikram Naidu
+      email: vikram.naidu@relay.test
+    members:
+    - name: Kavya Kapoor
+      email: kavya.kapoor@relay.test
+      position: PhD scholar
+    - name: Rohan Dutta
+      email: rohan.dutta@relay.test
+      position: MTech student
+    - name: Leela Ghosh
+      email: leela.ghosh@relay.test
+      position: Project associate
+    resources:
+    - name: HPC Node Block A (64 cores)
+      type: instrument
+      policy: institute_approval
+      profile: compute
+      location: CDS Block, Room CDS-101
+    - name: HPC Node Block B (128 cores)
+      type: instrument
+      policy: institute_approval
+      profile: compute
+      location: CDS Block, Room CDS-102
+    - name: Visualization Wall
+      type: instrument
+      policy: institute_open
+      profile: compute
+      location: CDS Block, Room CDS-103
+    - name: Seminar Room CDS-204
+      type: meeting_room
+      policy: department
+      profile: meeting
+      location: CDS Block, Room CDS-104

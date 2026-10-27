@@ -1,0 +1,38 @@
+[project]
+name = "relay-backend"
+version = "0.1.0"
+description = "Lab resource booking system: API and worker"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]>=3.2",
+    "alembic>=1.13",
+    "pydantic[email]>=2.7",
+    "pydantic-settings>=2.3",
+    "argon2-cffi>=23.1",
+    "python-dateutil>=2.9",
+    "tzdata>=2024.1",
+    "pyyaml>=6.0",
+    "apscheduler>=3.10,<4",
+    "icalendar>=5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["db: needs a PostgreSQL database (RELAY_TEST_DATABASE_URL)"]
+
+[tool.ruff]
+line-length = 125
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "UP"]
+ignore = ["B008"]  # FastAPI dependency injection uses Depends() defaults by design
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]

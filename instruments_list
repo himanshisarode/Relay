@@ -1,0 +1,224 @@
+# SEED DATA: departments, labs, resources (fictional)
+# policy: lab_only | department | institute_approval | institute_open
+
+departments:
+
+  - code: PHY
+    name: Department of Physics
+    labs:
+      - name: Quantum Materials Lab
+        resources:
+          - {name: Cryostat A (4K), type: instrument, policy: department}
+          - {name: Cryostat B (Dilution Fridge), type: instrument, policy: lab_only}
+          - {name: Vibrating Sample Magnetometer, type: instrument, policy: institute_approval}
+          - {name: Four-Probe Transport Station, type: instrument, policy: department}
+          - {name: Lab Meeting Room PH-101, type: meeting_room, policy: lab_only}
+      - name: Soft Matter Lab
+        resources:
+          - {name: Confocal Microscope, type: instrument, policy: institute_approval}
+          - {name: Rheometer, type: instrument, policy: department}
+          - {name: Dynamic Light Scattering Unit, type: instrument, policy: institute_approval}
+      - name: Optics and Photonics Lab
+        resources:
+          - {name: Femtosecond Laser Bench, type: instrument, policy: lab_only}
+          - {name: Raman Spectrometer, type: instrument, policy: institute_approval}
+          - {name: Optical Table 2, type: instrument, policy: department}
+
+  - code: CSA
+    name: Department of Computer Science and Automation
+    labs:
+      - name: Machine Learning Lab
+        resources:
+          - {name: GPU Server gpu-01 (4x A100), type: instrument, policy: institute_approval}
+          - {name: GPU Server gpu-02 (8x H100), type: instrument, policy: lab_only}
+          - {name: GPU Server gpu-03 (4x L40S), type: instrument, policy: institute_approval}
+          - {name: Seminar Room CSA-201, type: meeting_room, policy: department}
+      - name: Systems and Security Lab
+        resources:
+          - {name: Test Cluster (16 nodes), type: instrument, policy: lab_only}
+          - {name: Network Emulation Testbed, type: instrument, policy: department}
+          - {name: FPGA Development Board Bench, type: instrument, policy: department}
+      - name: Robotics Lab
+        resources:
+          - {name: 6-DOF Robotic Arm, type: instrument, policy: institute_approval}
+          - {name: Motion Capture Arena, type: instrument, policy: department}
+          - {name: Quadrotor Flight Cage, type: instrument, policy: institute_approval}
+
+  - code: ECE
+    name: Department of Electrical Communication Engineering
+    labs:
+      - name: Wireless Systems Lab
+        resources:
+          - {name: Anechoic Chamber, type: instrument, policy: institute_approval}
+          - {name: Vector Network Analyzer, type: instrument, policy: department}
+          - {name: Spectrum Analyzer (26 GHz), type: instrument, policy: department}
+          - {name: Software-Defined Radio Bench, type: instrument, policy: institute_open}
+      - name: VLSI and Circuits Lab
+        resources:
+          - {name: Probe Station, type: instrument, policy: lab_only}
+          - {name: Logic Analyzer Bench, type: instrument, policy: institute_open}
+          - {name: Mixed-Signal Oscilloscope Station, type: instrument, policy: department}
+      - name: Photonics Lab
+        resources:
+          - {name: Optical Spectrum Analyzer, type: instrument, policy: department}
+          - {name: Fibre Splicing Station, type: instrument, policy: institute_approval}
+
+  - code: MECH
+    name: Department of Mechanical Engineering
+    labs:
+      - name: Additive Manufacturing Lab
+        resources:
+          - {name: Metal 3D Printer, type: instrument, policy: institute_approval}
+          - {name: Polymer 3D Printer, type: instrument, policy: institute_open}
+          - {name: Resin 3D Printer, type: instrument, policy: institute_open}
+          - {name: Post-Processing Oven, type: instrument, policy: department}
+      - name: Fluid Dynamics Lab
+        resources:
+          - {name: Low-Speed Wind Tunnel, type: instrument, policy: department}
+          - {name: Particle Image Velocimetry Rig, type: instrument, policy: institute_approval}
+          - {name: Water Channel, type: instrument, policy: department}
+      - name: Manufacturing Lab
+        resources:
+          - {name: 5-Axis CNC Mill, type: instrument, policy: institute_approval}
+          - {name: Laser Cutter, type: instrument, policy: institute_open}
+          - {name: Universal Testing Machine, type: instrument, policy: institute_approval}
+
+  - code: CHEM
+    name: Department of Inorganic and Physical Chemistry
+    labs:
+      - name: Spectroscopy Lab
+        resources:
+          - {name: 600 MHz NMR Spectrometer, type: instrument, policy: institute_approval}
+          - {name: UV-Vis Spectrophotometer, type: instrument, policy: institute_open}
+          - {name: FTIR Spectrometer, type: instrument, policy: institute_open}
+          - {name: Fluorimeter, type: instrument, policy: department}
+      - name: Electrochemistry Lab
+        resources:
+          - {name: Potentiostat Station 1, type: instrument, policy: department}
+          - {name: Potentiostat Station 2, type: instrument, policy: department}
+          - {name: Glovebox (Argon), type: instrument, policy: lab_only}
+      - name: Crystallography Facility
+        resources:
+          - {name: Single-Crystal X-ray Diffractometer, type: instrument, policy: institute_approval}
+          - {name: Powder X-ray Diffractometer, type: instrument, policy: institute_approval}
+
+  - code: ORGC
+    name: Department of Organic Chemistry
+    labs:
+      - name: Synthesis and Analysis Lab
+        resources:
+          - {name: HPLC System, type: instrument, policy: department}
+          - {name: GC-MS, type: instrument, policy: institute_approval}
+          - {name: LC-MS (Q-TOF), type: instrument, policy: institute_approval}
+          - {name: Rotary Evaporator Bank, type: instrument, policy: institute_open}
+          - {name: Microwave Reactor, type: instrument, policy: department}
+
+  - code: BIO
+    name: Department of Biochemistry
+    labs:
+      - name: Cell Imaging Lab
+        resources:
+          - {name: Fluorescence Microscope, type: instrument, policy: institute_approval}
+          - {name: Live-Cell Imaging Incubator Scope, type: instrument, policy: institute_approval}
+          - {name: Flow Cytometer, type: instrument, policy: institute_approval}
+          - {name: Lab Meeting Room BC-105, type: meeting_room, policy: lab_only}
+      - name: Protein Structure Lab
+        resources:
+          - {name: Ultracentrifuge, type: instrument, policy: department}
+          - {name: FPLC System, type: instrument, policy: department}
+          - {name: Crystallization Robot, type: instrument, policy: lab_only}
+          - {name: Circular Dichroism Spectrometer, type: instrument, policy: institute_approval}
+      - name: Genomics Core
+        resources:
+          - {name: qPCR Machine 1, type: instrument, policy: institute_open}
+          - {name: qPCR Machine 2, type: instrument, policy: institute_open}
+          - {name: Next-Gen Sequencer, type: instrument, policy: institute_approval}
+          - {name: Gel Documentation System, type: instrument, policy: institute_open}
+
+  - code: MCB
+    name: Department of Microbiology and Cell Biology
+    labs:
+      - name: Microbial Imaging Lab
+        resources:
+          - {name: Super-Resolution Microscope, type: instrument, policy: institute_approval}
+          - {name: Light-Sheet Microscope, type: instrument, policy: institute_approval}
+          - {name: Anaerobic Chamber, type: instrument, policy: department}
+          - {name: Plate Reader, type: instrument, policy: institute_open}
+
+  - code: MAT
+    name: Department of Materials Engineering
+    labs:
+      - name: Electron Microscopy Facility
+        resources:
+          - {name: SEM (Scanning Electron Microscope), type: instrument, policy: institute_approval}
+          - {name: TEM (Transmission Electron Microscope), type: instrument, policy: institute_approval}
+          - {name: FIB-SEM, type: instrument, policy: institute_approval}
+          - {name: Sputter Coater, type: instrument, policy: institute_open}
+      - name: Thin Films Lab
+        resources:
+          - {name: Tube Furnace (1200C), type: instrument, policy: department}
+          - {name: Pulsed Laser Deposition System, type: instrument, policy: lab_only}
+          - {name: Spin Coater, type: instrument, policy: institute_open}
+          - {name: Atomic Force Microscope, type: instrument, policy: institute_approval}
+      - name: Mechanical Testing Lab
+        resources:
+          - {name: Nanoindenter, type: instrument, policy: institute_approval}
+          - {name: Hardness Tester, type: instrument, policy: institute_open}
+          - {name: Fatigue Testing Rig, type: instrument, policy: department}
+
+  - code: AERO
+    name: Department of Aerospace Engineering
+    labs:
+      - name: Propulsion Lab
+        resources:
+          - {name: Test Cell Slot, type: instrument, policy: lab_only}
+          - {name: High-Speed Camera Rig, type: instrument, policy: department}
+      - name: Flight Dynamics Lab
+        resources:
+          - {name: Flight Simulator Rig, type: instrument, policy: department}
+          - {name: Subsonic Wind Tunnel, type: instrument, policy: institute_approval}
+          - {name: Structural Test Frame, type: instrument, policy: department}
+
+  - code: CNS
+    name: Centre for Neuroscience
+    labs:
+      - name: Systems Neuroscience Lab
+        resources:
+          - {name: Two-Photon Imaging Rig, type: instrument, policy: institute_approval}
+          - {name: Electrophysiology Rig 1, type: instrument, policy: lab_only}
+          - {name: Electrophysiology Rig 2, type: instrument, policy: lab_only}
+          - {name: Behaviour Arena, type: instrument, policy: department}
+          - {name: Lab Meeting Room CNS-301, type: meeting_room, policy: lab_only}
+      - name: Neuroimaging Facility
+        resources:
+          - {name: EEG System, type: instrument, policy: institute_approval}
+          - {name: Eye Tracker Station, type: instrument, policy: institute_open}
+
+  - code: CES
+    name: Centre for Earth Sciences
+    labs:
+      - name: Geochemistry Lab
+        resources:
+          - {name: ICP-MS, type: instrument, policy: institute_approval}
+          - {name: Isotope Ratio Mass Spectrometer, type: instrument, policy: institute_approval}
+          - {name: Rock Crusher and Sample Prep Station, type: instrument, policy: department}
+          - {name: Thin-Section Microscope, type: instrument, policy: institute_open}
+
+  - code: MATH
+    name: Department of Mathematics
+    labs:
+      - name: Computational Mathematics Group
+        resources:
+          - {name: Compute Server math-01, type: instrument, policy: institute_open}
+          - {name: Compute Server math-02 (High Memory), type: instrument, policy: department}
+          - {name: Seminar Room MA-110, type: meeting_room, policy: department}
+
+  - code: CDS
+    name: Department of Computational and Data Sciences
+    labs:
+      - name: HPC Facility
+        resources:
+          - {name: HPC Node Block A (64 cores), type: instrument, policy: institute_approval}
+          - {name: HPC Node Block B (128 cores), type: instrument, policy: institute_approval}
+          - {name: Visualization Wall, type: instrument, policy: institute_open}
+          - {name: Seminar Room CDS-204, type: meeting_room, policy: department}

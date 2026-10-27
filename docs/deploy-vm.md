@@ -35,17 +35,23 @@ Mailpit only works locally. To deliver verification and approval emails, create 
 
 ## 5. Run the setup script (on the server)
 
+The GitHub repo is **private**, so the server needs a read-only token to download the code:
+
+1. On GitHub: **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**. Set **Repository access** to *Only select repositories → Relay*, and **Permissions** to *Contents: Read-only*. Give it an expiry date. Copy the token.
+2. On the server (`ssh root@139.59.10.20`):
+
 ```sh
-ssh root@139.59.10.20
-curl -fsSL https://raw.githubusercontent.com/himanshisarode/Relay/main/deploy/setup-server.sh -o setup.sh
-sudo bash setup.sh
+git clone https://himanshisarode:<TOKEN>@github.com/himanshisarode/Relay.git /opt/relay
+git -C /opt/relay remote set-url origin https://github.com/himanshisarode/Relay.git   # don't keep the token on disk
+sudo bash /opt/relay/deploy/setup-server.sh
 ```
+
+(If you ever make the repo public, the first line is just `git clone https://github.com/himanshisarode/Relay.git /opt/relay`.)
 
 The script:
 - installs Docker;
 - adds swap;
 - opens only ports 22, 80 and 443;
-- clones the repo to `/opt/relay`;
 - asks for the domain and SMTP details, and generates a random database password into `.env` (readable only by root);
 - starts everything.
 
@@ -58,12 +64,13 @@ docker compose -f docker-compose.prod.yml exec api python -m scripts.seed
 
 Open `https://<your address>/login` and sign in as `admin@relay.test` / `relay-demo-pass`.
 
-> **The demo password is public** (it's in the README), so anyone can sign in as admin. That's fine for a course demo. For real use, skip the demo seed (`python -m scripts.seed --no-demo`), register your own account and make it super admin as described in `docs/operations.md`.
+> **Everyone you share the demo accounts with can sign in as admin**, and the demo password is the same for every account. That's fine for a course demo. For real use, skip the demo seed (`python -m scripts.seed --no-demo`), register your own account and make it super admin as described in `docs/operations.md`.
 
 ## Updating after a new push to GitHub
 
 ```sh
-cd /opt/relay && git pull && docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+cd /opt/relay && git pull https://himanshisarode:<TOKEN>@github.com/himanshisarode/Relay.git main
+docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 ```
 
 ## Checklist

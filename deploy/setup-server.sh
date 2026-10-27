@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # One-time setup of a fresh Ubuntu 22.04/24.04 server for Relay (plan Q7, option B).
-# Run as root on the server:
-#   curl -fsSL https://raw.githubusercontent.com/himanshisarode/Relay/main/deploy/setup-server.sh -o setup.sh
-#   sudo bash setup.sh
-# It installs Docker, opens ports 22/80/443, clones the repo to /opt/relay, writes .env and starts the stack.
+# Clone the repo to /opt/relay first (see docs/deploy-vm.md; the repo is private), then run as root:
+#   sudo bash /opt/relay/deploy/setup-server.sh
+# It installs Docker, opens ports 22/80/443, writes .env and starts the stack.
 set -euo pipefail
 
-REPO="${REPO:-https://github.com/himanshisarode/Relay.git}"
 DIR=/opt/relay
 
 [ "$(id -u)" -eq 0 ] || { echo "Run with sudo."; exit 1; }
@@ -34,7 +32,7 @@ ufw allow 22/tcp >/dev/null && ufw allow 80/tcp >/dev/null && ufw allow 443/tcp 
 ufw --force enable >/dev/null
 
 echo "== 4/5 Code"
-if [ -d "$DIR/.git" ]; then git -C "$DIR" pull --ff-only; else git clone "$REPO" "$DIR"; fi
+[ -d "$DIR/.git" ] || { echo "Clone the repo to $DIR first (docs/deploy-vm.md, step 5)."; exit 1; }
 cd "$DIR"
 
 echo "== 5/5 Settings"

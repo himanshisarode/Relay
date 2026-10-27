@@ -38,6 +38,15 @@ Every seeded account uses the password **`relay-demo-pass`**.
 
 Every lab's professor, HOD and students are listed in `backend/seed/institute.yaml`.
 
+## Share a public demo link
+
+```sh
+docker compose --profile public up -d
+docker compose logs tunnel        # look for https://<random>.trycloudflare.com
+```
+
+Anyone can open that address in a browser and sign in with the demo accounts. It works only while this computer and Docker are running, and the address changes each time the tunnel restarts. Stop sharing with `docker compose stop tunnel`. For a permanent address, deploy `docker-compose.prod.yml` to a server (see `docs/operations.md`).
+
 ## Run the backend without Docker
 
 You need a PostgreSQL 16 server with the `btree_gist` and `citext` extensions available. These ship with the standard installers.
@@ -47,7 +56,7 @@ cd backend
 python -m venv .venv && .venv/Scripts/pip install -r requirements.txt   # bin/ on macOS/Linux
 set RELAY_DATABASE_URL=postgresql+psycopg://relay:relay@localhost:5432/relay
 set RELAY_COOKIE_SECURE=false
-set RELAY_DEV_EXPOSE_TOKENS=true
+set RELAY_DEV_EXPOSE_TOKENS=true   # local only; never with a public link
 alembic upgrade head && python -m scripts.seed
 uvicorn app.main:app --reload            # API on :8000
 python -m app.worker.main                # background jobs (separate terminal)

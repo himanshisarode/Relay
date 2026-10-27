@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 5173,
+    // Public demo link via `docker compose --profile public up -d` (Cloudflare quick tunnel).
+    allowedHosts: [".trycloudflare.com"],
     // Docker on Windows doesn't forward file-change events from the host, so poll there.
     watch: process.env.VITE_POLL ? { usePolling: true, interval: 300 } : undefined,
     proxy: {

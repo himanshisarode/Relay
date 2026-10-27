@@ -32,7 +32,8 @@ services:
       RELAY_TEST_DATABASE_URL: postgresql+psycopg://relay:relay@db:5432/relay_test
       RELAY_BASE_URL: http://localhost:5173
       RELAY_COOKIE_SECURE: "false"
-      RELAY_DEV_EXPOSE_TOKENS: "true"
+      # Never "true" while the public tunnel is up: it would hand out password-reset tokens.
+      RELAY_DEV_EXPOSE_TOKENS: "${RELAY_DEV_EXPOSE_TOKENS:-false}"
       RELAY_SMTP_HOST: mailpit
       RELAY_SMTP_PORT: "1025"
     volumes: ["./backend:/app"]
@@ -59,6 +60,14 @@ services:
     volumes: ["./frontend:/app", "frontend_node_modules:/app/node_modules"]
     ports: ["5173:5173"]
     depends_on: [api]
+
+  # Public demo link: `docker compose --profile public up -d`, then `docker compose logs tunnel` shows the
+  # https://<random>.trycloudflare.com address. It works only while this computer and Docker are running.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    profiles: [public]
+    command: tunnel --no-autoupdate --url http://frontend:5173
+    depends_on: [frontend]
 
 volumes:
   pgdata:

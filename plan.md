@@ -32,7 +32,7 @@ Department admins (HOD) can do the same for every lab in their department, appoi
 | Q4 | Pilot lab and its professor? | Seeded from `instruments_list` → `backend/seed/institute.yaml`: **14 departments, 30 labs, 104 resources, a professor per lab, a HOD per department, 3 students per lab** (all fictional). The real pilot lab is set up in the Admin UI; no code depends on which lab it is. | **Needs confirmation** by M7 |
 | Q5 | Import existing booking data? | No import in v1. A CSV import script is a P2 task, only if the pilot has a spreadsheet. | Decided |
 | Q6 | Check-in / sign-off after use? | Not in v1. `requires_checkin` is in the schema (default false). Check-in, no-show and post-use sign-off are P2. | Decided |
-| Q7 | Hosting and ownership? | One Linux VM running `docker-compose.prod.yml`: Caddy with automatic HTTPS, Postgres in a container, nightly `pg_dump` with 14-day retention. Handed to the pilot department's admin with `docs/operations.md`. | **Needs confirmation** of host and owner |
+| Q7 | Hosting and ownership? | **Option B (decided 2026-10-27): a student-credit VM**, DigitalOcean via the GitHub Student Developer Pack (Azure for Students as fallback). Ubuntu 24.04, 2 GB RAM, running `docker-compose.prod.yml` unchanged: Caddy with automatic HTTPS, Postgres in a container, nightly `pg_dump` (14-day retention). Address: own domain from the Student Pack, or `<ip>.sslip.io` with no domain. Email via an SMTP provider (e.g. Brevo free tier). Set up with `deploy/setup-server.sh` per `docs/deploy-vm.md`. Rejected: Oracle Always Free (fiddly sign-up, ARM capacity limits), managed platforms (app changes, sleeping free tiers), split hosting (most moving parts). | Host decided; **waiting on you** to create the account and server. Owner after the course still to confirm |
 
 ### 0.3 Technical decisions
 
@@ -153,6 +153,10 @@ Rule: routers stay thin. Every service that touches bookings calls `permissions.
 
 ### M7: Hardening and deployment
 - [x] Production compose, Caddy with HTTPS and security headers, nightly backup with retention, `docs/operations.md`, `docs/demo-script.md`
+- [x] Production stack built and run locally: HTTPS with an HTTP→HTTPS redirect, `Secure` session cookie, HSTS, no dev tokens, login and seed working, first backup written
+- [x] Hosting decided (Q7, option B); `docs/deploy-vm.md` + `deploy/setup-server.sh`
+- [ ] **You:** claim the Student Pack credits, create the droplet, get SMTP details, run the setup script
+- [ ] Smoke-test the live site (health, login, registration email, nightly backup)
 - [x] **Run the full suite against Postgres** (`docker compose exec api pytest -q`): 358 passed. The first run found three bugs, all fixed:
   - `alembic` couldn't import `app` in the container → `prepend_sys_path = .` in `alembic.ini`
   - Pydantic's `EmailStr` rejects reserved domains such as `.test`, so **no seeded account could sign in** → plain format check (`schemas.Email`)
@@ -160,8 +164,8 @@ Rule: routers stay thin. Every service that touches bookings calls `permissions.
   - plus: the route-table auth test had silently collected 0 routes (FastAPI now nests routers) → discover routes from OpenAPI, add a guard
 - [ ] Click through `docs/demo-script.md` in a browser; check both themes and phone width
 - [ ] Security pass against spec §14 on the running stack
-- [ ] Restore drill from a backup
-- [?] Pilot lab and professor (Q4), host and owner (Q7), pilot department admin (Q2)
+- [x] Restore drill: a `pg_dump -Fc` restored into an empty database gave identical row counts (138 users, 104 resources, 273 bookings), with the overlap constraint and audit trigger intact
+- [?] Pilot lab and professor (Q4), owner after the course (Q7), pilot department admin (Q2)
 
 ### Stretch (P2)
 - [ ] Check-in and no-show handling (`requires_checkin`)

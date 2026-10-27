@@ -447,7 +447,7 @@ Browser (React)  -->  FastAPI app  -->  PostgreSQL
 - **Database:** PostgreSQL with `btree_gist` and `citext` extensions.
 - **Packaging:** Docker Compose with services `api`, `worker`, `db`, `frontend` (static build served by a reverse proxy).
 - **Config:** a single settings module reading environment variables (database URL, SMTP, timezone, base URL).
-- **Deployment target:** any host that can run containers plus managed Postgres. Needs HTTPS and daily database backups.
+- **Deployment target:** a single Ubuntu VM paid for with student credits (DigitalOcean via the GitHub Student Developer Pack; Azure for Students as an alternative), running the production Docker Compose stack with Postgres in a container. Needs HTTPS (Caddy, automatic certificates) and daily database backups. See `docs/deploy-vm.md`.
 - **Observability:** structured logs, a `/health` endpoint, and error tracking if available.
 
 ---

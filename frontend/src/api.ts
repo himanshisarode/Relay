@@ -40,7 +40,13 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
   });
   if (res.status === 204) return undefined as T;
   const text = await res.text();
-  const data = text ? JSON.parse(text) : undefined;
+  let data: any;
+  try {
+    data = text ? JSON.parse(text) : undefined;
+  } catch {
+    // Usually an HTML page: /api isn't reaching the backend (e.g. Amplify rewrites missing or API_URL not replaced).
+    throw new ApiError(res.status, "bad_response", `The server sent an unexpected reply (${res.status}). The API may be unreachable.`);
+  }
   if (!res.ok) {
     const e = data?.error ?? {};
     throw new ApiError(res.status, e.code ?? "error", e.message ?? `Request failed (${res.status})`, e.details ?? {});

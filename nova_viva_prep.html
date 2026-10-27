@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nova — Viva Prep</title>
+<style>
+  :root{
+    --bg:#FFF8F3; --card:#ffffff; --border:#e8dfdc; --text:#2b2420;
+    --muted:#7a6f68; --accent:#A85C6B; --accent-bg:#F6E3E7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1c1816; --card:#262020; --border:#3a322e; --text:#f0e9e4;
+      --muted:#b8aca3; --accent:#e3a3b0; --accent-bg:#3a2730;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1c1816; --card:#262020; --border:#3a322e; --text:#f0e9e4;
+    --muted:#b8aca3; --accent:#e3a3b0; --accent-bg:#3a2730;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; padding:1.5rem;
+    padding-top:calc(1.5rem + env(safe-area-inset-top,0px));
+    padding-bottom:calc(1.5rem + env(safe-area-inset-bottom,0px));
+  }
+  .wrap{max-width:760px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 .25rem}
+  .sub{color:var(--muted);font-size:.9rem;margin:0 0 1rem}
+  .note{
+    background:var(--accent-bg); border:1px solid var(--border);
+    border-radius:10px; padding:.75rem 1rem; font-size:.85rem;
+    color:var(--text); margin-bottom:1.5rem;
+  }
+  h2{
+    font-size:1rem; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--accent); margin:1.75rem 0 .6rem; border-bottom:1px solid var(--border);
+    padding-bottom:.35rem;
+  }
+  details{
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    margin-bottom:.5rem; padding:.15rem 0;
+  }
+  summary{
+    cursor:pointer; padding:.7rem .9rem; font-weight:600; font-size:.95rem;
+    list-style:none; display:flex; gap:.5rem; align-items:baseline;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+"; color:var(--accent); font-weight:700; width:1em; flex-shrink:0}
+  details[open] summary::before{content:"–"}
+  .a{padding:0 .9rem .85rem 2.1rem; font-size:.9rem; color:var(--text)}
+  .a p{margin:.3rem 0}
+  code{
+    background:var(--accent-bg); padding:.1em .35em; border-radius:4px;
+    font-size:.85em;
+  }
+  footer{margin-top:2rem; font-size:.78rem; color:var(--muted); text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Nova — Viva Prep</h1>
+  <p class="sub">Technical Q&amp;A for the course viva. Tap a question to expand.</p>
+  <div class="note">
+    Reflects decisions made during planning. Claude Code has made further
+    implementation-level calls directly in the repo since (e.g. the exact
+    period-gap day threshold) — check SPEC.md for current exact numbers
+    before relying on one here.
+  </div>
+
+  <h2>Tech Stack &amp; Architecture</h2>
+
+  <details><summary>Why Streamlit instead of a separate React frontend + API backend?</summary>
+  <div class="a"><p>The actual DS/ML work — prediction intervals, the classifier, SHAP — is pure Python. Streamlit collapses UI and backend into one process, so there's no API layer to design and keep in sync, which mattered against a two-week-per-project clock. The tradeoff, accepted deliberately: less visual/interaction polish than a hand-built React app.</p></div>
+  </details>
+
+  <details><summary>Why SQLite instead of Postgres or a hosted DB?</summary>
+  <div class="a"><p>Small-scale, single or few-user app — no need for concurrent high-throughput access. SQLite is one file, which makes "delete my data" literally mean "delete the file," and needs no separate database server to run or maintain.</p></div>
+  </details>
+
+  <details><summary>Why Docker, and why does the volume matter?</summary>
+  <div class="a"><p>Reproducible environment, but the real reason is the persistent volume mount for the SQLite file. Most free hosting platforms run an ephemeral filesystem — local files silently get wiped on redeploy or restart. A Docker volume sidesteps that regardless of where it ends up running.</p></div>
+  </details>
+
+  <details><summary>Why run locally with a tunnel instead of Fly.io / Railway / Render / Amplify?</summary>
+  <div class="a"><p>Each had a specific disqualifying issue at this app's scale: no free tier at all, a free-tier volume that auto-expires, a free tier with no persistent disk whatsoever, or needing separate infrastructure (like AWS EFS) bolted on just to persist one SQLite file. Local + a tunnel is genuinely free, zero extra maintenance, and gives a real shareable HTTPS link.</p></div>
+  </details>
+
+  <h2>Prediction &amp; Statistics</h2>
+
+  <details><summary>How does "Honest" mode's prediction actually work?</summary>
+  <div class="a"><p>A 90% Student-t prediction interval from the user's own logged cycle lengths: <code>mean ± t(0.95, n−1) · s · √(1 + 1/n)</code>, sample std with n−1 denominator. Needs at least 3 completed cycles — below that it says "not enough data," never a fabricated number.</p></div>
+  </details>
+
+  <details><summary>Why a t-interval, not a simple percentile range or a Bayesian prior?</summary>
+  <div class="a"><p>An empirical percentile interval on raw lengths has real coverage of roughly (n−1)/(n+1) at small n — so a "90%" interval could actually cover closer to 50% of the time at n=3, misleadingly confident. A Bayesian population prior would narrow the interval using assumptions beyond the user's own logged spread, breaking the "built only from your own data" claim and making the validation partly circular. The t-interval has the stated coverage under reasonable assumptions at every n, and naturally narrows as more cycles accumulate.</p></div>
+  </details>
+
+  <details><summary>How was the interval actually validated?</summary>
+  <div class="a"><p>Against a synthetic simulator with known, generated ground truth — realistic cycle-length distributions calibrated from a real published study, not guessed numbers. Predict at every point from 3 cycles onward across 100 simulated users, pool thousands of predictions, and check ~90% actually contain the true next date. The pass/fail gate runs on regular-cycle data only, since the method doesn't claim to handle irregular cycles; that number is recorded as informational, not a gate.</p></div>
+  </details>
+
+  <details><summary>Why keep "Simple" mode at all, if "Honest" is better?</summary>
+  <div class="a"><p>It's a deliberate baseline — literally what most commercial trackers do (a single point-estimate date). Keeping it side by side with Honest mode makes the point of the whole project visible by contrast, not just claimed in the README.</p></div>
+  </details>
+
+  <h2>ML &amp; Explainability</h2>
+
+  <details><summary>Why Random Forest for the irregularity classifier, not a neural net?</summary>
+  <div class="a"><p>Small tabular dataset — a neural net would be overkill and harder to explain for no benefit. Random Forest pairs with SHAP's TreeExplainer, which is fast and exact for tree models, versus the slower, approximate KernelExplainer needed for other model types.</p></div>
+  </details>
+
+  <details><summary>Why validate the classifier on synthetic data first?</summary>
+  <div class="a"><p>Same reasoning as the prediction interval — need labeled ground truth to measure recall against, and real logged data has no reliable "this cycle was actually irregular" label. The simulator plants a known irregular fraction so recall (≥0.80 bar) can be checked against something actually known to be true.</p></div>
+  </details>
+
+  <details><summary>What does SHAP actually add here?</summary>
+  <div class="a"><p>Turns "the model flagged this" into "the model flagged this because of X" — a per-flag, per-feature explanation, not just a yes/no label. That's the core differentiator from a black-box flag.</p></div>
+  </details>
+
+  <h2>Privacy &amp; AI Usage</h2>
+
+  <details><summary>Where does this app call an external AI API, and why only there?</summary>
+  <div class="a"><p>Deliberately minimal. Explain My Trend sends only pre-computed aggregate numbers (never raw logs) to turn stats into a sentence — a genuine language task. Lifestyle-Link Finder and Remedy Effectiveness were kept <em>off</em> the API on purpose: "does X correlate with Y in your data" is a statistics question, not a language one. Routing it through an LLM would mean the AI guessing at a pattern with no real computation behind it — breaks the core rule that every result traces to an actual statistic.</p></div>
+  </details>
+
+  <details><summary>How is partner read-only access actually enforced?</summary>
+  <div class="a"><p>At the database query layer, not the UI. A partner-scoped query function is built to be structurally incapable of writing — hiding an edit button in the UI doesn't stop a direct function or request from writing anyway; enforcing it where the data is fetched does.</p></div>
+  </details>
+
+  <h2>Testing &amp; SDD Process</h2>
+
+  <details><summary>Why were test files written before the implementation code existed?</summary>
+  <div class="a"><p>Spec-driven development — tests encode the acceptance criteria as the build target, not a check bolted on after. For the two local-stats features, expected numbers were hand-computed independently, not derived by re-running the same formula inside the test — e.g. a deliberately planted mean difference with a hand-calculated Welch's t-statistic — so the test catches a shared bug even if the implementation uses the exact same flawed logic.</p></div>
+  </details>
+
+  <details><summary>What's the actual SDD workflow being followed?</summary>
+  <div class="a"><p>Spec (goals, non-goals, acceptance criteria) → Plan (ordered phases, each with its own acceptance criteria and explicitly flagged risks) → implement one phase at a time → stop and review the diff before the next phase. Scope changes get written back into the spec explicitly, never silently absorbed into code.</p></div>
+  </details>
+
+  <footer>Nova — course project viva prep · built from the SDD planning conversation</footer>
+</div>
+</body>
+</html>
